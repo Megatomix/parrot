@@ -37,13 +37,12 @@ defmodule ParrotWeb.RoomChannel do
     push(socket, "new_event", payload)
     {:noreply, socket}
   end
-
   def handle_out("new_event", _payload, socket) do
     {:noreply, socket}
   end
 
   # Add authorization logic here as required.
-  defp authorized?(payload) do
+  defp authorized?(_payload) do
     true
   end
 
