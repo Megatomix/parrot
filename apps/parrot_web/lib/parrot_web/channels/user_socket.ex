@@ -26,15 +26,8 @@ defmodule ParrotWeb.UserSocket do
       |> assign(:app_id, appId)
     {:ok, socket}
   end
-  def connect(params, socket) do
-    userId = Map.get(params, "user_id")
-    appId = Map.get(params, "app_id")
-
-    socket =
-      socket
-      |> assign(:user_id, userId)
-      |> assign(:app_id, appId)
-    {:ok, socket}
+  def connect(_params, _socket) do
+    :error
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
@@ -47,5 +40,7 @@ defmodule ParrotWeb.UserSocket do
   #     ParrotWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: nil
+  def id(socket) do
+    "#{socket.assigns.app_id}:#{socket.assigns.user_id}"
+  end
 end
