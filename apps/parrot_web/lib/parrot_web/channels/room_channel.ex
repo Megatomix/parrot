@@ -19,6 +19,9 @@ defmodule ParrotWeb.RoomChannel do
     {:reply, {:ok, payload}, socket}
   end
 
+  def handle_in("new_event", %{"type" => "ECHO"}, socket) do
+    {:noreply, socket}
+  end
   def handle_in("new_event", payload, socket) do
     broadcast_msg(payload, socket)
 
