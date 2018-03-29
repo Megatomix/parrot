@@ -19,11 +19,13 @@ defmodule ParrotWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"user_id" => userId, "app_id" => appId}, socket) do
+  def connect(%{"user_id" => userId, "app_id" => appId} = params, socket) do
+    fallback = Map.get(params, "fallback")
     socket =
       socket
       |> assign(:user_id, userId)
       |> assign(:app_id, appId)
+      |> assign(:fallback, fallback)
     {:ok, socket}
   end
   def connect(_params, _socket) do
