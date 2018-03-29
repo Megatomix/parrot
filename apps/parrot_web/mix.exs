@@ -42,7 +42,9 @@ defmodule ParrotWeb.Mixfile do
       {:phoenix_ecto, "~> 3.2"},
       {:gettext, "~> 0.11"},
       {:parrot, in_umbrella: true},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:httpoison, "~> 1.0"},
+      {:poison, "~> 3.1"}
     ]
   end
 
