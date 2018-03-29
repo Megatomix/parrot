@@ -5,6 +5,6 @@ config :parrot, Parrot.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "parrot_dev",
+  database: "dashboard_dev",
   hostname: "localhost",
   pool_size: 10
