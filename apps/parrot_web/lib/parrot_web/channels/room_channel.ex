@@ -5,12 +5,26 @@ defmodule ParrotWeb.RoomChannel do
 
   intercept ["new_event"]
 
-  def join("room:" <> _appId, payload, socket) do
+  def join("room:" <> _appId,
+           payload,
+           %{assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}} = socket
+  ) do
     if authorized?(payload) do
+      Shooter.shoot_msg(%{
+        "app_id" => app_id,
+        "user_id" => user_id,
+        "type" => "CONNECT",
+        "payload" => %{
+          "fallback" => fallback
+        }
+      })
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+  def join("room:" <> _appId, _payload, _socket) do
+    {:error, %{reason: "bad request"}}
   end
 
   # Channels can be used in a request/response fashion
