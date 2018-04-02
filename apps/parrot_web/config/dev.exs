@@ -29,4 +29,5 @@ config :parrot_web, ParrotWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
-
+config :peerage, via: Peerage.Via.Self,
+  interval: 60000
