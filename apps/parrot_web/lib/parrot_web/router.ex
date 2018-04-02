@@ -12,6 +12,6 @@ defmodule ParrotWeb.Router do
   end
 
   scope "/", ParrotWeb do
-    get "/socket/phoenix", Dummy, :ok
+    get "/phoenix", Dummy, :ok
   end
 end

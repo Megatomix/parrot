@@ -1,7 +1,7 @@
 defmodule ParrotWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :parrot_web
 
-  socket "/socket", ParrotWeb.UserSocket
+  socket "/websocket", ParrotWeb.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
