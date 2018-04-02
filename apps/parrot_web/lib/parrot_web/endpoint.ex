@@ -36,6 +36,8 @@ defmodule ParrotWeb.Endpoint do
     key: "_parrot_web_key",
     signing_salt: "14ity/Eu"
 
+  plug CORSPlug
+
   plug ParrotWeb.Router
 
   @doc """
