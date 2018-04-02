@@ -15,7 +15,7 @@ defmodule Shooter do
         integration.integration_endpoint,
         payload |> Poison.encode!,
         [
-          {"Content-Type", "application/json"},
+          {"content-type", "application/json"},
         ]
       )
     else
@@ -24,12 +24,12 @@ defmodule Shooter do
   end
 
   defp send_to_aligator(payload) do
-    if aligator_url() != "" do
+    if aligator_url() != nil do
       HTTPoison.post(
         aligator_url() <> "/conversation",
         %{"event" => payload} |> Poison.encode!,
         [
-          {"Content-Type", "application/json"},
+          {"content-type", "application/json"},
         ]
       )
     else
@@ -38,7 +38,7 @@ defmodule Shooter do
   end
 
   defp aligator_url() do
-    Application.get_env(:shooter, Aligator, [])
-    |> Keyword.get(:aligator_url, "")
+    Application.get_env(:shooter, Shooter, [])
+    |> Keyword.get(:aligator_url)
   end
 end
