@@ -10,4 +10,8 @@ defmodule ParrotWeb.Router do
 
     post "/", Dummy, :dump
   end
+
+  scope "/", ParrotWeb do
+    get "/socket/phoenix", Dummy, :ok
+  end
 end

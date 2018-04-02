@@ -1,6 +1,11 @@
 defmodule ParrotWeb.Dummy do
   use ParrotWeb, :controller
 
+  def ok(conn, params) do
+    conn
+    |> send_resp(200, "Ok")
+  end
+
   def dump(conn, params) do
     ParrotWeb.Endpoint.broadcast("room:#{params["app_id"]}", "new_event", params)
 
