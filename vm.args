@@ -1,0 +1,3 @@
+-name widget-chat-backend@${MY_POD_IP}
+-setcookie ${MAGIC_COOKIE}
+
