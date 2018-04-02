@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: phoenix-chat-backend
+  name: phoenix-chat-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: phoenix-chat-backend
+  template:
+    metadata:
+      labels:
+        app: phoenix-chat-backend
+    spec:
+      containers:
+      - args:
+        - foreground
+        env:
+        - name: APP_NAME
+          value: widget-chat-backend
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: DB_USER
+          value: lulamolusco
+        - name: DB_PASS
+          value: =cSGLWplIS+Qq._.ddSd0'GY&
+        - name: DB_HOST
+          value: dashboard-calamar.cxecbavaatzn.us-east-1.rds.amazonaws.com
+        - name: DB_NAME
+          value: dashboard
+        - name: MAGIC_COOKIE
+          value: vsC4dGDjSQ5nBpF7Fssqf37RuzA/j6+GI15PaALGrhBSO6zUHJI/L/RQJLYaunYT
+        - name: LOGGER_LEVEL
+          value: debug
+        - name: PORT
+          value: "8080"
+        image: 362338258830.dkr.ecr.us-east-1.amazonaws.com/chat-backend:02-0420h35m
+        imagePullPolicy: IfNotPresent
+        name: phoenix-chat-backend
+        ports:
+          - containerPort: 8080
+            protocol: TCP
