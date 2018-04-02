@@ -44,7 +44,9 @@ defmodule ParrotWeb.Mixfile do
       {:parrot, in_umbrella: true},
       {:cowboy, "~> 1.0"},
       {:httpoison, "~> 1.0"},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:peerage, "~> 1.0"},
+      {:cors_plug, "~> 1.5"}
     ]
   end
 
