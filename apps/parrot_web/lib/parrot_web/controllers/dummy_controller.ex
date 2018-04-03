@@ -1,4 +1,4 @@
-defmodule ParrotWeb.Dummy do
+defmodule ParrotWeb.DummyController do
   use ParrotWeb, :controller
 
   def ok(conn, params) do

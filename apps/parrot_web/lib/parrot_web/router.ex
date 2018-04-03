@@ -8,10 +8,10 @@ defmodule ParrotWeb.Router do
   scope "/api", ParrotWeb do
     pipe_through :api
 
-    post "/", Dummy, :dump
+    post "/", DummyController, :dump
   end
 
   scope "/", ParrotWeb do
-    get "/phoenix", Dummy, :ok
+    get "/phoenix", DummyController, :ok
   end
 end
