@@ -5,7 +5,11 @@ defmodule ParrotWeb.RoomChannelTest do
 
   setup do
     {:ok, _, socket} =
-      socket("user_id", %{some: :assign})
+      socket("user_id", %{
+        user_id: "test_user",
+        app_id: "test_app",
+        fallback: nil
+      })
       |> subscribe_and_join(RoomChannel, "room:lobby")
 
     {:ok, socket: socket}
@@ -16,13 +20,26 @@ defmodule ParrotWeb.RoomChannelTest do
     assert_reply ref, :ok, %{"hello" => "there"}
   end
 
-  test "shout broadcasts to room:lobby", %{socket: socket} do
-    push socket, "shout", %{"hello" => "all"}
-    assert_broadcast "shout", %{"hello" => "all"}
+  test "new_event with MSG payload should echo with RECV payload", %{socket: socket} do
+    push socket, "new_event", %{"type" => "MSG", "hello" => "world!"}
+    assert_broadcast "new_event", %{"type" => "RECV", "hello" => "world!"}
   end
 
-  test "broadcasts are pushed to the client", %{socket: socket} do
-    broadcast_from! socket, "broadcast", %{"some" => "data"}
-    assert_push "broadcast", %{"some" => "data"}
+  test "new_event doesn't arrive to different app_id", %{socket: socket} do
+    broadcast_from! socket, "new_event", %{"app_id" => "wrong_app", "user_id" => "test_user"}
+
+    refute_push "new_event", %{"app_id" => "wrong_app", "user_id" => "test_user"}
+  end
+
+  test "new_event doesn't arrive to same app_id and different user_id", %{socket: socket} do
+    broadcast_from! socket, "new_event", %{"app_id" => "test_app", "user_id" => "test_user_2"}
+
+    refute_push "new_event", %{"app_id" => "test_app", "user_id" => "test_user_2"}
+  end
+
+  test "new_event arrive to same app_id and user_id", %{socket: socket} do
+    broadcast_from! socket, "new_event", %{"app_id" => "test_app", "user_id" => "test_user"}
+
+    assert_push "new_event", %{"app_id" => "test_app", "user_id" => "test_user"}
   end
 end
