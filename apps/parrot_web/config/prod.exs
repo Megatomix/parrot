@@ -60,7 +60,3 @@ config :peerage, via: Peerage.Via.Dns,
   dns_name: "chat-backend-service-headless.${NAMESPACE}.svc.cluster.local",
   app_name: "widget-chat-backend",
   interval: 5
-
-# Finally import the config/prod.secret.exs
-# which should be versioned separately.
-import_config "prod.secret.exs"

@@ -2,7 +2,6 @@ defmodule Shooter do
   require Logger
 
   use Retry
-  import Stream
 
   def shoot_msg(%{"app_id" => app_id} = payload) do
     Logger.debug "Shooting #{inspect payload}"
@@ -14,7 +13,7 @@ defmodule Shooter do
   defp send_to_integration(app_id, payload) do
     integration = Parrot.Customers.get_integration(app_id)
     if integration != nil do
-      retry with: lin_backoff(10, @fibonacci) |> cap(1_000) |> take(4) do
+      retry with: lin_backoff(10, 3) |> cap(1_000) |> Stream.take(4) do
         HTTPoison.post(
           integration.integration_endpoint,
           payload |> Poison.encode!,

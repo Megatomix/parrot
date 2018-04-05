@@ -9,7 +9,7 @@ defmodule ParrotWeb.RoomChannel do
            payload,
            %{assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}} = socket
   ) do
-    if authorized?(payload) do
+    if authorized?(app_id) do
       Shooter.shoot_msg(%{
         "app_id" => app_id,
         "user_id" => user_id,
@@ -56,7 +56,7 @@ defmodule ParrotWeb.RoomChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(%{"app_id" => app_id}) do
+  defp authorized?(app_id) do
     case Parrot.Customers.get_customer(app_id) do
       %{active: active} ->
         active
