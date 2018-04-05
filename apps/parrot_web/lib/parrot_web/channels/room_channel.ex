@@ -5,7 +5,7 @@ defmodule ParrotWeb.RoomChannel do
 
   intercept ["new_event"]
 
-  def join("room:" <> _appId,
+  def join("room:" <> app_id,
            payload,
            %{assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}} = socket
   ) do
@@ -56,9 +56,15 @@ defmodule ParrotWeb.RoomChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
+  defp authorized?(%{"app_id" => app_id}) do
+    case Parrot.Customers.get_customer(app_id) do
+      %{active: active} ->
+        active
+      _ ->
+        false
+    end
   end
+  defp authorized?(_payload), do: false
 
   defp broadcast_msg(%{"type" => "MSG"} = payload, socket) do
     new_payload = Map.put(payload, "type", "RECV")

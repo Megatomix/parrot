@@ -6,7 +6,7 @@ defmodule Parrot.Customers do
   import Ecto.Query, warn: false
   alias Parrot.Repo
 
-  alias Parrot.Customers.Integration
+  alias Parrot.Customers.{Integration, Customer}
 
   @doc """
   Returns the list of integrations.
@@ -101,5 +101,9 @@ defmodule Parrot.Customers do
   """
   def change_integration(%Integration{} = integration) do
     Integration.changeset(integration, %{})
+  end
+
+  def get_customer(app_id) do
+    Repo.get_by(Customer, app_id: app_id)
   end
 end
