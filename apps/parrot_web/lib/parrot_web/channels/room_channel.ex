@@ -5,19 +5,9 @@ defmodule ParrotWeb.RoomChannel do
 
   intercept ["new_event"]
 
-  def join("room:" <> app_id,
-           _payload,
-           %{assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}} = socket
-  ) do
+  def join("room:" <> app_id, _payload, socket) do
     if authorized?(app_id) do
-      Shooter.shoot_msg(%{
-        "app_id" => app_id,
-        "user_id" => user_id,
-        "type" => "CONNECT",
-        "payload" => %{
-          "fallback" => fallback
-        }
-      })
+      send self(), :connect
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -52,6 +42,20 @@ defmodule ParrotWeb.RoomChannel do
     {:noreply, socket}
   end
   def handle_out("new_event", _payload, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info(:connect, %{
+    assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}
+  } = socket) do
+    Shooter.shoot_msg(%{
+      "app_id" => app_id,
+      "user_id" => user_id,
+      "type" => "CONNECT",
+      "payload" => %{
+        "fallback" => fallback
+      }
+    })
     {:noreply, socket}
   end
 
