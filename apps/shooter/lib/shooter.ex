@@ -10,6 +10,21 @@ defmodule Shooter do
   end
   def shoot_msg(_payload), do: nil
 
+  def send_to_aligator(payload) do
+    Logger.debug "Sending to aligator #{inspect payload}"
+    if aligator_url() != nil do
+      HTTPoison.post(
+        aligator_url() <> "/conversation",
+        %{"event" => payload} |> Poison.encode!,
+        [
+          {"content-type", "application/json"},
+        ]
+      )
+    else
+      nil
+    end
+  end
+
   defp send_to_integration(app_id, payload) do
     integration = Parrot.Customers.get_integration(app_id)
     if integration != nil do
@@ -22,20 +37,6 @@ defmodule Shooter do
           ]
         )
       end
-    else
-      nil
-    end
-  end
-
-  defp send_to_aligator(payload) do
-    if aligator_url() != nil do
-      HTTPoison.post(
-        aligator_url() <> "/conversation",
-        %{"event" => payload} |> Poison.encode!,
-        [
-          {"content-type", "application/json"},
-        ]
-      )
     else
       nil
     end

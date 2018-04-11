@@ -21,8 +21,9 @@ defmodule ParrotWeb.DummyController do
     echo = Map.put(payload, "type", "ECHO")
 
     Shooter.shoot_msg(echo)
+    Shooter.send_to_aligator(payload)
   end
   defp handle_in(payload) do
-    Shooter.shoot_msg(payload)
+    Shooter.send_to_aligator(payload)
   end
 end
