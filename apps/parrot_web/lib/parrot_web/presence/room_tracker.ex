@@ -19,7 +19,7 @@ defmodule ParrotWeb.RoomTracker do
         for {user_id, _meta} <- leaves do
           not is_online?(topic, user_id)
             && Redis.del!("#{app_id}:#{user_id}")
-            && Shoot.shoot_msg(%{
+            && Shooter.shoot_msg(%{
               "app_id" => app_id,
               "user_id" => user_id,
               "type" => "END_SESSION"
