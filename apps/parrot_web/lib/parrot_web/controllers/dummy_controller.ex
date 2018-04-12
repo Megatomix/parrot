@@ -1,7 +1,7 @@
 defmodule ParrotWeb.DummyController do
   use ParrotWeb, :controller
 
-  def ok(conn, params) do
+  def ok(conn, _params) do
     conn
     |> send_resp(200, "Ok")
   end
@@ -22,6 +22,13 @@ defmodule ParrotWeb.DummyController do
 
     Shooter.shoot_msg(echo)
     Shooter.send_to_aligator(payload)
+    Redis.update_session!(payload)
+  end
+  defp handle_in(%{"type" => "SET_CHAT_INFO"} = payload) do
+    Redis.update_session!(payload)
+  end
+  defp handle_in(%{"type" => "SET_CHAT_THEME"} = payload) do
+    Redis.update_session!(payload)
   end
   defp handle_in(payload) do
     Shooter.send_to_aligator(payload)

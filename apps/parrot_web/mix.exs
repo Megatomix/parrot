@@ -48,7 +48,8 @@ defmodule ParrotWeb.Mixfile do
       {:peerage, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
       {:retry, "~> 0.8.1"},
-      {:shooter, in_umbrella: true}
+      {:shooter, in_umbrella: true},
+      {:redis, in_umbrella: true}
     ]
   end
 

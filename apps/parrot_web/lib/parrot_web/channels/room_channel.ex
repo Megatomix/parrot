@@ -1,5 +1,6 @@
 defmodule ParrotWeb.RoomChannel do
   use ParrotWeb, :channel
+  alias ParrotWeb.RoomTracker, as: Tracker
 
   require Logger
 
@@ -7,14 +8,11 @@ defmodule ParrotWeb.RoomChannel do
 
   def join("room:" <> app_id, _payload, socket) do
     if authorized?(app_id) do
-      send self(), :connect
+      send self(), :after_join
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
-  end
-  def join("room:" <> _appId, _payload, _socket) do
-    {:error, %{reason: "bad request"}}
   end
 
   # Channels can be used in a request/response fashion
@@ -45,17 +43,31 @@ defmodule ParrotWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_info(:connect, %{
+  def handle_info(:after_join, %{
     assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}
   } = socket) do
-    Shooter.shoot_msg(%{
-      "app_id" => app_id,
-      "user_id" => user_id,
-      "type" => "CONNECT",
-      "payload" => %{
-        "fallback" => fallback
-      }
-    })
+    if Tracker.is_online?("admin:#{app_id}", user_id) do
+      messages =
+        Redis.get!("#{app_id}:#{user_id}")
+        |> Map.get("messages", [])
+
+      for message <- messages do
+        push(socket, "new_event", message)
+      end
+      Logger.debug "#{user_id} already online"
+    else
+      Shooter.shoot_msg(%{
+        "app_id" => app_id,
+        "user_id" => user_id,
+        "type" => "CONNECT",
+        "payload" => %{
+          "fallback" => fallback
+        }
+      })
+    end
+
+    {:ok, _} = Tracker.track(self(), "admin:#{app_id}", user_id, %{})
+    Logger.debug("handle_info #{inspect(Tracker.list("admin:#{app_id}"))}")
     {:noreply, socket}
   end
 
@@ -71,6 +83,8 @@ defmodule ParrotWeb.RoomChannel do
 
   defp broadcast_msg(%{"type" => "MSG"} = payload, socket) do
     new_payload = Map.put(payload, "type", "RECV")
+
+    Redis.update_session!(new_payload)
 
     broadcast_from(socket, "new_event", new_payload)
   end
