@@ -10,7 +10,7 @@ defmodule ParrotWeb.Application do
       supervisor(ParrotWeb.Endpoint, []),
       # Start your own worker by calling: ParrotWeb.Worker.start_link(arg1, arg2, arg3)
       # worker(ParrotWeb.Worker, [arg1, arg2, arg3]),
-      worker(ParrotWeb.RoomTracker, [[
+      supervisor(ParrotWeb.RoomTracker, [[
         name: ParrotWeb.RoomTracker, pubsub_server: ParrotWeb.PubSub
       ]])
     ]

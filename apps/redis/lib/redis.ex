@@ -12,7 +12,7 @@ defmodule Redis do
     str_json = Poison.encode! payload
     Redis.command!(["SET", "#{redis_key(key)}", str_json])
   end
-  def save!(key, _payload) do
+  def save!(_key, _payload) do
     raise ArgumentError, message: "Invalid argument, expected map"
   end
 

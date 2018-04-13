@@ -1,12 +1,20 @@
 defmodule ParrotWeb.RoomTracker do
   @behaviour Phoenix.Tracker
 
+  @task_supervisor Module.concat(__MODULE__, TaskSupervisor)
+
   require Logger
 
   def start_link(opts) do
+    import Supervisor.Spec
     opts = Keyword.merge([name: __MODULE__], opts)
-    GenServer.start_link(Phoenix.Tracker, [__MODULE__, opts, opts], name: __MODULE__)
-  end
+
+    children = [
+      supervisor(Task.Supervisor, [[name: @task_supervisor]]),
+      worker(Phoenix.Tracker, [__MODULE__, opts, opts])
+    ]
+    Supervisor.start_link(children, strategy: :one_for_one)
+end
 
   def init(opts) do
     server = Keyword.fetch!(opts, :pubsub_server)
@@ -14,7 +22,7 @@ defmodule ParrotWeb.RoomTracker do
   end
 
   def handle_diff(diff, state) do
-    Task.start(fn ->
+    Task.Supervisor.start_child(@task_supervisor, fn ->
       for {"admin:" <> app_id = topic, {_joins, leaves}} <- diff do
         for {user_id, _meta} <- leaves do
           not is_online?(topic, user_id)
