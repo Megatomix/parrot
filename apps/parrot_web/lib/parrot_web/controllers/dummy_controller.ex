@@ -6,15 +6,24 @@ defmodule ParrotWeb.DummyController do
     |> send_resp(200, "Ok")
   end
 
-  def dump(conn, params) do
-    ParrotWeb.Endpoint.broadcast("room:#{params["app_id"]}", "new_event", params)
+  def dump(conn, %{"app_id" => app_id, "user_id" => user_id} = params) do
+    if ParrotWeb.RoomTracker.is_online?("admin:#{app_id}", user_id) do
+      ParrotWeb.Endpoint.broadcast("#{app_id}:#{user_id}", "new_event", params)
 
-    Task.async(fn ->
-      handle_in(params)
-    end)
+      Task.async(fn ->
+        handle_in(params)
+      end)
 
+      conn
+      |> send_resp(200, "Ok")
+    else
+      conn
+      |> send_resp(404, "User not online anymore")
+    end
+  end
+  def dump(conn, _params) do
     conn
-    |> send_resp(200, "Ok")
+    |> send_resp(400, "Missing app_id or user_id")
   end
 
   defp handle_in(%{"type" => "RECV"} = payload) do
