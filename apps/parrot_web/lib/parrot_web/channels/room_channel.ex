@@ -46,24 +46,24 @@ defmodule ParrotWeb.RoomChannel do
   def handle_info(:after_join, %{
     assigns: %{app_id: app_id, user_id: user_id, fallback: fallback}
   } = socket) do
+    Shooter.shoot_msg(%{
+      "app_id" => app_id,
+      "user_id" => user_id,
+      "type" => "CONNECT",
+      "payload" => %{
+        "fallback" => fallback
+      }
+    })
+
     if Tracker.is_online?("admin:#{app_id}", user_id) do
       messages =
-        Redis.get!("#{app_id}:#{user_id}")
+        Redis.get("#{app_id}:#{user_id}", %{})
         |> Map.get("messages", [])
 
       for message <- messages do
         push(socket, "new_event", message)
       end
       Logger.debug "#{user_id} already online"
-    else
-      Shooter.shoot_msg(%{
-        "app_id" => app_id,
-        "user_id" => user_id,
-        "type" => "CONNECT",
-        "payload" => %{
-          "fallback" => fallback
-        }
-      })
     end
 
     {:ok, _} = Tracker.track(self(), "admin:#{app_id}", user_id, %{})

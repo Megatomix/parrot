@@ -24,12 +24,6 @@ defmodule ParrotWeb.DummyController do
     Shooter.send_to_aligator(payload)
     Redis.update_session!(payload)
   end
-  defp handle_in(%{"type" => "SET_CHAT_INFO"} = payload) do
-    Redis.update_session!(payload)
-  end
-  defp handle_in(%{"type" => "SET_CHAT_THEME"} = payload) do
-    Redis.update_session!(payload)
-  end
   defp handle_in(payload) do
     Shooter.send_to_aligator(payload)
   end

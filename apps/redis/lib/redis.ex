@@ -31,17 +31,20 @@ defmodule Redis do
     end
   end
 
+  def get(key, default \\ nil) do
+    try do
+      get!(key)
+    rescue
+      KeyError ->
+        default
+      Poison.SyntaxError ->
+        default
+    end
+  end
+
   def update_session!(%{"user_id" => user_id, "app_id" => app_id} = payload) do
     key = "#{app_id}:#{user_id}"
-    session =
-      try do
-        get!(key)
-      rescue
-        KeyError ->
-          %{}
-        Poison.SyntaxError ->
-          %{}
-      end
+    session = get(key, %{})
 
     messages = Map.get(session, "messages", [])
     messages = messages ++ [payload]
