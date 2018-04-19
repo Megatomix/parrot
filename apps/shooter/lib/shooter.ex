@@ -13,13 +13,7 @@ defmodule Shooter do
   def send_to_aligator(payload) do
     Logger.debug "Sending to aligator #{inspect payload}"
     if aligator_url() != nil do
-      HTTPoison.post(
-        aligator_url() <> "/conversation",
-        %{"event" => payload} |> Poison.encode!,
-        [
-          {"content-type", "application/json"},
-        ]
-      )
+      retry_send(aligator_url() <> "/conversation", %{"event" => payload})
     else
       nil
     end
@@ -28,17 +22,28 @@ defmodule Shooter do
   defp send_to_integration(app_id, payload) do
     integration = Parrot.Customers.get_integration(app_id)
     if integration != nil do
-      retry with: lin_backoff(10, 3) |> cap(1_000) |> Stream.take(4) do
-        HTTPoison.post(
-          integration.integration_endpoint,
-          payload |> Poison.encode!,
-          [
-            {"content-type", "application/json"},
-          ]
-        )
-      end
+      req = [{integration.primary_app, payload}, {integration.secondary_app, %{"standby" => payload}}]
+      tasks = Enum.reduce(0..(length(req)), [], fn {url, body}, acc ->
+        [Task.async(fn -> retry_send(url, body) end) | acc]
+      end)
+
+      Enum.map(tasks, &Task.await/1)
     else
       nil
+    end
+  end
+
+  defp retry_send(nil, _payload), do: nil
+  defp retry_send("", _payload), do: nil
+  defp retry_send(url, payload) do
+    retry with: lin_backoff(10, 3) |> cap(1_000) |> Stream.take(4) do
+      HTTPoison.post(
+        url,
+        payload |> Poison.encode!,
+        [
+          {"content-type", "application/json"},
+        ]
+      )
     end
   end
 

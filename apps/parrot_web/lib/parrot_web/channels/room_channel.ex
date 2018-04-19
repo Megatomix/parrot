@@ -67,7 +67,6 @@ defmodule ParrotWeb.RoomChannel do
     end
 
     {:ok, _} = Tracker.track(self(), "admin:#{app_id}", user_id, %{})
-    Logger.debug("handle_info #{inspect(Tracker.list("admin:#{app_id}"))}")
     {:noreply, socket}
   end
 
