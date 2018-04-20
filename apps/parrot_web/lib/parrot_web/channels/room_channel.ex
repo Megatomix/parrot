@@ -6,9 +6,10 @@ defmodule ParrotWeb.RoomChannel do
 
   intercept ["new_event"]
 
-  def join("room:" <> app_id, _payload, socket) do
+  def join("room:" <> app_id, _payload, %{assigns: %{user_id: user_id}} = socket) do
     if authorized?(app_id) do
       send self(), :after_join
+      ParrotWeb.Endpoint.subscribe("#{app_id}:#{user_id}")
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -68,6 +69,12 @@ defmodule ParrotWeb.RoomChannel do
 
     {:ok, _} = Tracker.track(self(), "admin:#{app_id}", user_id, %{})
     Logger.debug("handle_info #{inspect(Tracker.list("admin:#{app_id}"))}")
+    {:noreply, socket}
+  end
+
+  alias Phoenix.Socket.Broadcast
+  def handle_info(%Broadcast{topic: _, event: ev, payload: payload}, socket) do
+    push socket, ev, payload
     {:noreply, socket}
   end
 
